@@ -18,11 +18,15 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)
 base_dir = "/data/oHongMenYan/distracted-driver-detection-dataset"
 out_dir = '/output'
 
+print("begin")
+logging.debug("begin")
 # unzip imgs.zip
 def unzip_imgs(zip_dir, target_dir):
     f = zipfile.ZipFile(zip_dir, 'r')
-    print('begin')
-    logging.debug("begin")
+    print('unzip begin')
+    logging.debug("unzip begin")
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
     for file in f.namelist():
         print(file)
         logging.debug(file)
@@ -30,9 +34,13 @@ def unzip_imgs(zip_dir, target_dir):
     print('done')
     logging.debug('done')
 
-img_zip_dir = os.path.join(base_dir, "imgs.zip")
 imgs_dir = os.path.join(out_dir, "img")
-unzip_imgs(img_zip_dir, imgs_dir)
+# unzip train.zip
+img_train_zip_dir = os.path.join(base_dir, "train.zip")
+unzip_imgs(img_train_zip_dir, imgs_dir)
+# unzip valid.zip
+img_valid_zip_dir = os.path.join(base_dir, "valid.zip")
+unzip_imgs(img_valid_zip_dir, imgs_dir)
 
 
 model_image_size = (240, 360)
@@ -96,10 +104,10 @@ print("train_generator.samples = {}".format(train_generator.samples))
 logging.debug("train_generator.samples = {}".format(train_generator.samples))
 print("valid_generator.samples = {}".format(valid_generator.samples))
 logging.debug("valid_generator.samples = {}".format(valid_generator.samples))
-# steps_train_sample = train_generator.samples // batch_size + 1
-# steps_valid_sample = valid_generator.samples // batch_size + 1.
-steps_train_sample = train_generator.samples // (20*batch_size) + 1
-steps_valid_sample = valid_generator.samples // (20*batch_size) + 1.
+steps_train_sample = train_generator.samples // batch_size + 1
+steps_valid_sample = valid_generator.samples // batch_size + 1.
+# steps_train_sample = train_generator.samples // (20*batch_size) + 1
+# steps_valid_sample = valid_generator.samples // (20*batch_size) + 1.
 # 先用adam训练
 epochs=6
 # epochs=1
@@ -222,5 +230,13 @@ def gen_kaggle_csv(imgs_test_dir, model,  model_image_size, csv_name):
 print("done")
 logging.debug("done")
 
-csv_path = os.path.join(out_dir, 'csv', 'resnet50-imagenet-finetune{}-pred.csv'.format(fine_tune_layer))
-gen_kaggle_csv(imgs_test_dir, model, model_image_size, csv_path)
+if os.path.exists(imgs_test_dir):
+    print("imgs_test_dir exists")
+    logging.debug("imgs_test_dir exists")
+    csv_path = os.path.join(out_dir, 'csv', 'resnet50-imagenet-finetune{}-pred.csv'.format(fine_tune_layer))
+    gen_kaggle_csv(imgs_test_dir, model, model_image_size, csv_path)
+    print("gen_kaggle_csv done")
+    logging.debug("gen_kaggle_csv done")
+
+print("All done")
+logging.debug("All done")
