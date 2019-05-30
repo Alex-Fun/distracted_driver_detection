@@ -39,8 +39,8 @@ model_image_size = (240, 360)
 fine_tune_layer = 152
 final_layer = 176
 visual_layer = 172
-# batch_size = 128
-batch_size = 32
+batch_size = 128
+# batch_size = 32
 
 def lambda_func(x):
     x /= 255.
@@ -101,8 +101,8 @@ logging.debug("valid_generator.samples = {}".format(valid_generator.samples))
 steps_train_sample = train_generator.samples // (20*batch_size) + 1
 steps_valid_sample = valid_generator.samples // (20*batch_size) + 1.
 # 先用adam训练
-# epochs=6
-epochs=1
+epochs=6
+# epochs=1
 
 model_dir = os.path.join(out_dir, "models")
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
