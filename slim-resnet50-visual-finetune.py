@@ -13,6 +13,33 @@ import model
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
 
+flags = tf.app.flags
+
+# flags.DEFINE_string('record_path',
+#                     '/data2/raycloud/jingxiong_datasets/AIChanllenger/' +
+#                     'AgriculturalDisease_trainingset/train.record',
+#                     'Path to training tfrecord file.')
+# flags.DEFINE_string('checkpoint_path',
+#                     '/home/jingxiong/python_project/model_zoo/' +
+#                     'resnet_v1_50.ckpt',
+#                     'Path to pretrained ResNet-50 model.')
+# flags.DEFINE_string('logdir', './training', 'Path to log directory.')
+flags.DEFINE_float('learning_rate', 0.001, 'Initial learning rate.')
+flags.DEFINE_float(
+    'learning_rate_decay_factor', 0.1, 'Learning rate decay factor.')
+flags.DEFINE_float(
+    'num_epochs_per_decay', 3.0,
+    'Number of epochs after which learning rate decays. Note: this flag counts '
+    'epochs per clone but aggregates per sync replicas. So 1.0 means that '
+    'each clone will go over full epoch individually, but replicas will go '
+    'once across all replicas.')
+flags.DEFINE_integer('num_samples', 20787, 'Number of samples.')
+flags.DEFINE_integer('num_classes', 10, 'Number of classes')
+flags.DEFINE_integer('num_steps', 10000, 'Number of steps.')
+flags.DEFINE_integer('batch_size', 48, 'Batch size')
+
+FLAGS = flags.FLAGS
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s', level=logging.DEBUG)
 base_dir = "/data/oHongMenYan/distracted-driver-detection-dataset"
 out_dir = '/output'
@@ -24,12 +51,13 @@ fine_tune_layer = 152
 # final_layer = 176
 # visual_layer = 172
 num_classes = 10
-batch_size = 128
+batch_size = FLAGS.batch_size
+# batch_size = 128
 batch_size = 64
 # batch_size = 32
 train_examples_num = 20787
 epochs_num_per_optimizer = 6
-num_steps = int(train_examples_num * epochs_num_per_optimizer / batch_size + 1)
+num_steps = int(train_examples_num * epochs_num_per_optimizer / batch_size)
 
 def main(_):
     print("begin")
@@ -75,7 +103,7 @@ def main(_):
 
     global_step = slim.get_global_step()
 
-    learning_rate = 1e-4
+    learning_rate = 1e-3
     # adam优化器
     with tf.variable_scope("adam_vars"):
         adam_optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
