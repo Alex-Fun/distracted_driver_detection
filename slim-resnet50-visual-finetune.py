@@ -19,6 +19,18 @@ out_dir = '/output'
 # base_dir = r"D:\tmp\data\state-farm-distracted-driver-detection"
 # out_dir = r"D:\tmp\data\state-farm-distracted-driver-detection\output"
 
+model_image_size = (240, 360)
+fine_tune_layer = 152
+# final_layer = 176
+# visual_layer = 172
+num_classes = 10
+batch_size = 128
+batch_size = 64
+# batch_size = 32
+train_examples_num = 20787
+epochs_num_per_optimizer = 6
+num_steps = int(train_examples_num * epochs_num_per_optimizer / batch_size + 1)
+
 def main(_):
     print("begin")
     logging.debug("begin")
@@ -30,17 +42,6 @@ def main(_):
     logs_dir = os.path.join(out_dir, "logs")
     if not os.path.exists(logs_dir):
         os.makedirs(imgs_dir, exist_ok=True)
-
-    model_image_size = (240, 360)
-    fine_tune_layer = 152
-    # final_layer = 176
-    # visual_layer = 172
-    num_classes = 10
-    batch_size = 128
-    # batch_size = 32
-    train_examples_num = 20787
-    epochs_num_per_optimizer = 6
-    num_steps = int(train_examples_num * epochs_num_per_optimizer/batch_size + 1)
 
     # 加载数据集
     # 读取tfrecord文件
