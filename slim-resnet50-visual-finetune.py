@@ -41,27 +41,29 @@ flags.DEFINE_integer('batch_size', 48, 'Batch size')
 FLAGS = flags.FLAGS
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s', level=logging.DEBUG)
-base_dir = "/data/oHongMenYan/distracted-driver-detection-dataset"
-out_dir = '/output'
-# base_dir = r"D:\tmp\data\state-farm-distracted-driver-detection"
-# out_dir = r"D:\tmp\data\state-farm-distracted-driver-detection\output"
 
-model_image_size = (240, 360)
-fine_tune_layer = 152
-# final_layer = 176
-# visual_layer = 172
-num_classes = 10
-batch_size = FLAGS.batch_size
-# batch_size = 128
-batch_size = 64
-# batch_size = 32
-train_examples_num = 20787
-epochs_num_per_optimizer = 6
-num_steps = int(train_examples_num * epochs_num_per_optimizer / batch_size)
 
 def main(_):
     print("begin")
     logging.debug("begin")
+
+    base_dir = "/data/oHongMenYan/distracted-driver-detection-dataset"
+    out_dir = '/output'
+    # base_dir = r"D:\tmp\data\state-farm-distracted-driver-detection"
+    # out_dir = r"D:\tmp\data\state-farm-distracted-driver-detection\output"
+
+    model_image_size = (240, 360)
+    fine_tune_layer = 152
+    # final_layer = 176
+    # visual_layer = 172
+    num_classes = 10
+    batch_size = FLAGS.batch_size
+    # batch_size = 128
+    batch_size = 64
+    # batch_size = 32
+    train_examples_num = 20787
+    epochs_num_per_optimizer = 6
+    num_steps = int(train_examples_num * epochs_num_per_optimizer / batch_size)
 
     imgs_dir = os.path.join(out_dir, "img")
     if not os.path.exists(imgs_dir):
