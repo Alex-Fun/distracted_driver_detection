@@ -1,6 +1,5 @@
 import  tensorflow as tf
 from tensorflow.contrib.slim import nets
-import preprocessing.preprocessing_factory
 import tensorflow.contrib.slim as slim
 # slim = tf.contrib.slim
 
@@ -16,15 +15,15 @@ class Model():
     def num_class(self):
         return self._num_classes
 
-    def preprocess(self, inputs):
-        preprocessed_inputs = preprocessing.preprocess_images(
-            inputs, self._default_image_size, self._default_image_size,
-            resize_side_min=self._fixed_resize_side,
-            is_training=self._is_training,
-            border_expand=True, normalize=False,
-            preserving_aspect_ratio_resize=False)
-        preprocessed_inputs = tf.cast(preprocessed_inputs, tf.float32)
-        return preprocessed_inputs
+    # def preprocess(self, inputs):
+    #     preprocessed_inputs = preprocessing.preprocess_images(
+    #         inputs, self._default_image_size, self._default_image_size,
+    #         resize_side_min=self._fixed_resize_side,
+    #         is_training=self._is_training,
+    #         border_expand=True, normalize=False,
+    #         preserving_aspect_ratio_resize=False)
+    #     preprocessed_inputs = tf.cast(preprocessed_inputs, tf.float32)
+    #     return preprocessed_inputs
 
     def predict(self, preprocessed_inputs):
         with slim.arg_scope(nets.resnet_v1.resnet_arg_scope()):
