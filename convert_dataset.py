@@ -102,12 +102,6 @@ def create_tf_record(output_filename, file_pars):
 def read_images_names(root, c_num=10, train=True):
     img_dir = os.path.join(root, 'train' if train else 'valid')
 
-
-    # with open(txt_fname, 'r') as f:
-    #     # read 读入全部内容
-    #     # split 按行分割成数组
-    #     images = f.read().split()
-
     data = []
     label = []
     for c_index in range(c_num):
@@ -118,9 +112,6 @@ def read_images_names(root, c_num=10, train=True):
             data.append(img_path)
             label.append(c_index)
             # print('---', img_path, c_index)
-    # for img_name, c_index in dict.iterrows():
-    #     data.append('%s/c%d/%s' % (img_dir, c_index, img_name))
-    #     label.append('%s/SegmentationClass/%s.png' % (root, fname))
     print('===', len(list), len(label))
     return zip(data, label)
 
