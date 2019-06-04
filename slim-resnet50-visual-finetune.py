@@ -59,8 +59,8 @@ def main(_):
     num_classes = 10
     # batch_size = FLAGS.batch_size
     # batch_size = 128
-    batch_size = 64
-    # batch_size = 32
+    # batch_size = 64
+    batch_size = 32
     train_examples_num = 20787
     epochs_num_per_optimizer = 6
     num_steps = int(train_examples_num * epochs_num_per_optimizer / batch_size)
