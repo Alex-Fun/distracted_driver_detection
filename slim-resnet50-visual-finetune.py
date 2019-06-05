@@ -9,10 +9,12 @@ import zipfile
 import logging
 import utils
 import model
+import time
 
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
 
+# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # flags = tf.app.flags
 #
 # # flags.DEFINE_string('record_path',
@@ -44,8 +46,9 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)
 
 
 def main(_):
-    print("begin")
-    logging.debug("begin")
+    begin_time = time.time()
+    print("begin time:", begin_time)
+    logging.debug("begin begin_time:{}".format(begin_time))
 
     base_dir = "/data/oHongMenYan/distracted-driver-detection-dataset"
     out_dir = '/output'
@@ -53,16 +56,19 @@ def main(_):
     # out_dir = r"D:\tmp\data\state-farm-distracted-driver-detection\output"
 
     model_image_size = (240, 360)
-    fine_tune_layer = 152
+    # fine_tune_layer = 152
     # final_layer = 176
     # visual_layer = 172
     num_classes = 10
     # batch_size = FLAGS.batch_size
     # batch_size = 128
-    # batch_size = 64
-    batch_size = 32
+    batch_size = 64
+    # batch_size = 32
     train_examples_num = 20787
+    # train_examples_num = 64
+    # train_examples_num = 32
     epochs_num_per_optimizer = 6
+    # epochs_num_per_optimizer = 1
     num_steps = int(train_examples_num * epochs_num_per_optimizer / batch_size)
 
     imgs_dir = os.path.join(out_dir, "img")
@@ -83,17 +89,18 @@ def main(_):
 
     # slim.dataset.Dataset()
     # 加载数据文件
-    image_train, label_train = utils.read_TFRecord(dataset_train, image_shape=model_image_size, batch_size=batch_size, num_epochs=1e4)
-    image_valid, label_valid = utils.read_TFRecord(dataset_val, image_shape=model_image_size, batch_size=batch_size, num_epochs=1e4)
+    image_train, label_train = utils.read_TFRecord(dataset_train, image_shape=model_image_size, batch_size=batch_size,
+                                                   num_epochs=1e4)
+    image_valid, label_valid = utils.read_TFRecord(dataset_val, image_shape=model_image_size, batch_size=batch_size,
+                                                   num_epochs=1e4)
 
-    # 数据resize，等预处理
-        # tfrecord数据已经预处理了，此处省略
+    # tfrecord数据已经预处理了，此处省略
     # resnet50 ImageNet的ckpt，
-        # todo 对前152层finetune
     checkpoint_path = os.path.join(base_dir, 'resnet_v1_50.ckpt')
+    # checkpoint_path = os.path.join(base_dir, 'ckpt\\')
 
     resnet_model = model.Model(num_classes=num_classes, is_training=True, fixed_resize_side=model_image_size[0],
-                default_image_size=model_image_size[0])
+                               default_image_size=model_image_size[0])
     prediction_dict = resnet_model.predict(image_train)
     loss_dict = resnet_model.loss(prediction_dict, label_train)
     loss = loss_dict['loss']
@@ -104,8 +111,14 @@ def main(_):
     tf.summary.scalar('accuracy', accuracy)
 
     global_step = slim.get_global_step()
+    if not global_step:
+        print("global_step is none")
+        # Creates a variable to hold the global_step.
+        global_step = tf.Variable(0, trainable=False, name='global_step', dtype=tf.int64)
+        print('global_step:', global_step)
+    init_fn = utils.get_init_fn(checkpoint_path=checkpoint_path)
 
-    learning_rate = 1e-3
+    learning_rate = 1e-4
     # adam优化器
     with tf.variable_scope("adam_vars"):
         adam_optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
@@ -117,18 +130,11 @@ def main(_):
 
             gradient_name_to_save = current_variable.name.replace(":", "_")
             tf.summary.histogram(gradient_name_to_save, current_gradient)
-        # train_step = adam_optimizer.apply_gradients(grads_and_vars=adam_gradients, global_step=global_step)
-        train_op = slim.learning.create_train_op(loss, adam_optimizer, summarize_gradients=True)
+        adam_train_step = adam_optimizer.apply_gradients(grads_and_vars=adam_gradients, global_step=global_step)
+        # train_op = slim.learning.create_train_op(loss, adam_optimizer, summarize_gradients=True)
 
     # tf.summary.scalar('learning_rate', learning_rate)
-    init_fn = utils.get_init_fn(checkpoint_path=checkpoint_path)
 
-
-    slim.learning.train(train_op=train_op, logdir=logs_dir, global_step=global_step, init_fn=init_fn,
-                        number_of_steps=num_steps, save_summaries_secs=20, save_interval_secs=600)
-
-
-    num_steps = 2*num_steps
     # RMSprop优化器 lr=1e-5
     with tf.variable_scope("rmsprop_vars"):
         rmsprop_lr = 1e-5
@@ -141,24 +147,126 @@ def main(_):
 
             gradient_name_to_save = current_variable.name.replace(":", "_")
             tf.summary.histogram(gradient_name_to_save, current_gradient)
-        # train_step = adam_optimizer.apply_gradients(grads_and_vars=adam_gradients, global_step=global_step)
-        rmsprop_train_op = slim.learning.create_train_op(loss, rmsprop_optimizer, summarize_gradients=True)
+        rmsprop_train_step = rmsprop_optimizer.apply_gradients(grads_and_vars=adam_gradients, global_step=global_step)
+        # rmsprop_train_op = slim.learning.create_train_op(loss, rmsprop_optimizer, summarize_gradients=True)
 
-    slim.learning.train(train_op=rmsprop_train_op, logdir=logs_dir, global_step=global_step, init_fn=init_fn,
-                        number_of_steps=num_steps, save_summaries_secs=20, save_interval_secs=600)
+    # # adam优化器
+    # with tf.variable_scope("adam_vars"):
+    #     adam_optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+    #     # adam_gradients = adam_optimizer.compute_gradients(loss=loss)
+    #
+    #     # for grad_var_pair in adam_gradients:
+    #     #     current_variable = grad_var_pair[1]
+    #     #     current_gradient = grad_var_pair[0]
+    #     #
+    #     #     gradient_name_to_save = current_variable.name.replace(":", "_")
+    #     #     tf.summary.histogram(gradient_name_to_save, current_gradient)
+    #     # train_step = adam_optimizer.apply_gradients(grads_and_vars=adam_gradients, global_step=global_step)
+    #     # train_op = slim.learning.create_train_op(loss, adam_optimizer, summarize_gradients=True)
+    #     train_adam = adam_optimizer.minimize(loss, global_step=global_step)
+    #
+    # # tf.summary.scalar('learning_rate', learning_rate)
+    #
+    #
+    # # slim.learning.train(train_op=train_op, logdir=logs_dir, global_step=global_step, init_fn=init_fn,
+    # #                     number_of_steps=num_steps, save_summaries_secs=20, save_interval_secs=600)
+    #
+    #
+    # # num_steps = 2*num_steps
+    # # # RMSprop优化器 lr=1e-5
+    # with tf.variable_scope("rmsprop_vars"):
+    #     rmsprop_lr = 1e-5
+    #     rmsprop_optimizer = tf.train.AdamOptimizer(learning_rate=rmsprop_lr)
+    #     # rmsprop_gradients = rmsprop_optimizer.compute_gradients(loss=loss)
+    #
+    #     # for grad_var_pair in rmsprop_gradients:
+    #     #     current_variable = grad_var_pair[1]
+    #     #     current_gradient = grad_var_pair[0]
+    #     #
+    #     #     gradient_name_to_save = current_variable.name.replace(":", "_")
+    #     #     tf.summary.histogram(gradient_name_to_save, current_gradient)
+    #     # train_step = rmsprop_optimizer.apply_gradients(grads_and_vars=adam_gradients, global_step=global_step)
+    #     train_rmsprop = rmsprop_optimizer.minimize(loss, global_step=global_step)
+    #     # rmsprop_train_op = slim.learning.create_train_op(loss, rmsprop_optimizer, summarize_gradients=True)
+    #
+    # # slim.learning.train(train_op=rmsprop_train_op, logdir=logs_dir, global_step=global_step, init_fn=init_fn,
+    # #                     number_of_steps=num_steps, save_summaries_secs=20, save_interval_secs=600)
+
+    merged_summary_op = tf.summary.merge_all()
+    summary_string_writer = tf.summary.FileWriter(logs_dir)
+
+    config = tf.ConfigProto(allow_soft_placement=True)
+    config.gpu_options.allow_growth = True
+    sess = tf.Session(config=config)
+    init_op = tf.global_variables_initializer()
+    init_local_op = tf.local_variables_initializer()
+
+    with sess:
+        sess.run(init_op)
+        sess.run(init_local_op)
+        saver = tf.train.Saver(max_to_keep=5)
+        init_fn(sess)
+        # saver.restore(sess, checkpoint_path)
+
+        logging.debug('checkpoint restored from [{0}]'.format(checkpoint_path))
+
+        coord = tf.train.Coordinator()
+        threads = tf.train.start_queue_runners(coord=coord)
+
+        start = time.time()
+        print('adam go-----------------')
+        for i in range(num_steps):
+            gs, _ = sess.run([global_step, adam_train_step])
+            logging.debug("Current adam step: {0} _:{1} index:{2} ".format(gs, _, i))
+            adam_loss, summary_string, acc_score = sess.run([loss, merged_summary_op, accuracy])
+            logging.debug("adam step {0} Current Loss: {1} acc_score:{2} index:{3}".format(gs, adam_loss, acc_score, i))
+            end = time.time()
+            logging.debug("adam [{0:.2f}] imgs/s".format(batch_size / (end - start)))
+            start = end
+
+            summary_string_writer.add_summary(summary_string, i)
+            if i == num_steps - 1:
+                save_path = saver.save(sess, os.path.join(logs_dir, "model_adam.ckpt"), global_step=gs)
+                logging.debug("Model saved in file: %s" % save_path)
+
+        print('rmsprop go-----------------')
+        for i in range(num_steps):
+            gs, _ = sess.run([global_step, rmsprop_train_step])
+            logging.debug("Current rmsprop step: {0} _:{1} index:{2} ".format(gs, _, i))
+            rmsprop_loss, summary_string, acc_score = sess.run([loss, merged_summary_op, accuracy])
+            logging.debug("rmsprop step {0} Current Loss: {1} acc_score:{2} index:{3}".format(gs, rmsprop_loss, acc_score, i))
+            end = time.time()
+            logging.debug("rmsprop [{0:.2f}] imgs/s".format(batch_size / (end - start)))
+            start = end
+
+            summary_string_writer.add_summary(summary_string, i)
+            if i == num_steps - 1:
+                save_path = saver.save(sess, os.path.join(logs_dir, "model_rmsprop.ckpt"), global_step=gs)
+                logging.debug("Model saved in file: %s" % save_path)
+
+        coord.request_stop()
+        coord.join(threads)
+        save_path = saver.save(sess, os.path.join(logs_dir, "model.ckpt"), global_step=gs)
+        logging.debug("Model finally saved in file: %s" % save_path)
+
+    cost_time = int(time.time() - begin_time)
+    print("All done cost_time: %d " % (cost_time))
+
+    summary_string_writer.close()
+
+    logging.debug("All done cost_time:{}".format(cost_time))
+
+
 
 
 if __name__ == '__main__':
     tf.app.run()
-
-
 
 # fn = utils.get_init_fn(checkpoint_path)
 #
 #
 # slim.learning.create_train_op()
 # slim.learning.train()
-
 
 
 # 初始化两个优化器，先后用两个优化器训练
