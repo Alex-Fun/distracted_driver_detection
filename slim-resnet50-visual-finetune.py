@@ -67,7 +67,7 @@ def main(_):
     train_examples_num = 20787
     # train_examples_num = 64
     # train_examples_num = 32
-    epochs_num_per_optimizer = 6
+    epochs_num_per_optimizer = 12
     # epochs_num_per_optimizer = 1
     num_steps = int(train_examples_num * epochs_num_per_optimizer / batch_size)
 
@@ -136,18 +136,18 @@ def main(_):
     # tf.summary.scalar('learning_rate', learning_rate)
 
     # RMSprop优化器 lr=1e-5
-    with tf.variable_scope("rmsprop_vars"):
-        rmsprop_lr = 1e-5
-        rmsprop_optimizer = tf.train.AdamOptimizer(learning_rate=rmsprop_lr)
-        rmsprop_gradients = rmsprop_optimizer.compute_gradients(loss=loss)
-
-        for grad_var_pair in rmsprop_gradients:
-            current_variable = grad_var_pair[1]
-            current_gradient = grad_var_pair[0]
-
-            gradient_name_to_save = current_variable.name.replace(":", "_")
-            tf.summary.histogram(gradient_name_to_save, current_gradient)
-        rmsprop_train_step = rmsprop_optimizer.apply_gradients(grads_and_vars=adam_gradients, global_step=global_step)
+    # with tf.variable_scope("rmsprop_vars"):
+    #     rmsprop_lr = 1e-5
+    #     rmsprop_optimizer = tf.train.AdamOptimizer(learning_rate=rmsprop_lr)
+    #     rmsprop_gradients = rmsprop_optimizer.compute_gradients(loss=loss)
+    #
+    #     for grad_var_pair in rmsprop_gradients:
+    #         current_variable = grad_var_pair[1]
+    #         current_gradient = grad_var_pair[0]
+    #
+    #         gradient_name_to_save = current_variable.name.replace(":", "_")
+    #         tf.summary.histogram(gradient_name_to_save, current_gradient)
+    #     rmsprop_train_step = rmsprop_optimizer.apply_gradients(grads_and_vars=adam_gradients, global_step=global_step)
         # rmsprop_train_op = slim.learning.create_train_op(loss, rmsprop_optimizer, summarize_gradients=True)
 
     # # adam优化器
@@ -229,20 +229,20 @@ def main(_):
                 save_path = saver.save(sess, os.path.join(logs_dir, "model_adam.ckpt"), global_step=gs)
                 logging.debug("Model saved in file: %s" % save_path)
 
-        print('rmsprop go-----------------')
-        for i in range(num_steps):
-            gs, _ = sess.run([global_step, rmsprop_train_step])
-            logging.debug("Current rmsprop step: {0} _:{1} index:{2} ".format(gs, _, i))
-            rmsprop_loss, summary_string, acc_score = sess.run([loss, merged_summary_op, accuracy])
-            logging.debug("rmsprop step {0} Current Loss: {1} acc_score:{2} index:{3}".format(gs, rmsprop_loss, acc_score, i))
-            end = time.time()
-            logging.debug("rmsprop [{0:.2f}] imgs/s".format(batch_size / (end - start)))
-            start = end
-
-            summary_string_writer.add_summary(summary_string, i)
-            if i == num_steps - 1:
-                save_path = saver.save(sess, os.path.join(logs_dir, "model_rmsprop.ckpt"), global_step=gs)
-                logging.debug("Model saved in file: %s" % save_path)
+        # print('rmsprop go-----------------')
+        # for i in range(num_steps):
+        #     gs, _ = sess.run([global_step, rmsprop_train_step])
+        #     logging.debug("Current rmsprop step: {0} _:{1} index:{2} ".format(gs, _, i))
+        #     rmsprop_loss, summary_string, acc_score = sess.run([loss, merged_summary_op, accuracy])
+        #     logging.debug("rmsprop step {0} Current Loss: {1} acc_score:{2} index:{3}".format(gs, rmsprop_loss, acc_score, i))
+        #     end = time.time()
+        #     logging.debug("rmsprop [{0:.2f}] imgs/s".format(batch_size / (end - start)))
+        #     start = end
+        #
+        #     summary_string_writer.add_summary(summary_string, i)
+        #     if i == num_steps - 1:
+        #         save_path = saver.save(sess, os.path.join(logs_dir, "model_rmsprop.ckpt"), global_step=gs)
+        #         logging.debug("Model saved in file: %s" % save_path)
 
         coord.request_stop()
         coord.join(threads)
