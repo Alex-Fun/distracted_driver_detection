@@ -97,8 +97,8 @@ def main(_):
     # tfrecord数据已经预处理了，此处省略
     # resnet50 ImageNet的ckpt，
     # checkpoint_path = os.path.join(base_dir, 'resnet_v1_50.ckpt')
+    checkpoint_path = os.path.join(base_dir, 'checkpoint')
     # checkpoint_path = os.path.join(base_dir, 'ckpt')
-    checkpoint_path = base_dir
 
     resnet_model = model.Model(num_classes=num_classes, is_training=True, fixed_resize_side=model_image_size[0],
                                default_image_size=model_image_size[0])

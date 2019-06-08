@@ -39,6 +39,7 @@ def read_TFRecord(filename, image_shape, num_epochs=1, batch_size = 32):
 def get_init_fn(checkpoint_path, checkpoint_include_scopes=None, checkpoint_exclude_scopes=None):
     if checkpoint_path is None:
         return None
+    tf.logging.info('before Fine-tuning from %s' % checkpoint_path)
     if tf.gfile.IsDirectory(checkpoint_path):
         checkpoint_path = tf.train.latest_checkpoint(checkpoint_path)
     tf.logging.info('Fine-tuning from %s' % checkpoint_path)
