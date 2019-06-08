@@ -97,7 +97,7 @@ def main(_):
     # tfrecord数据已经预处理了，此处省略
     # resnet50 ImageNet的ckpt，
     # checkpoint_path = os.path.join(base_dir, 'resnet_v1_50.ckpt')
-    checkpoint_path = os.path.join(base_dir, 'ckpt\\')
+    checkpoint_path = os.path.join(base_dir, 'ckpt')
 
     resnet_model = model.Model(num_classes=num_classes, is_training=True, fixed_resize_side=model_image_size[0],
                                default_image_size=model_image_size[0])
@@ -119,22 +119,22 @@ def main(_):
     init_fn = utils.get_init_fn(checkpoint_path=checkpoint_path)
 
     # learning_rate = 1e-4
-    learning_rate = tf.placeholder(dtype=tf.float32, name='learning_rate')
     # adam优化器
     with tf.variable_scope("adam_vars"):
+        learning_rate = tf.Variable(initial_value=1e-5, dtype=tf.float32, name='learning_rate')
         adam_optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
         adam_gradients = adam_optimizer.compute_gradients(loss=loss)
 
-        for grad_var_pair in adam_gradients:
-            current_variable = grad_var_pair[1]
-            current_gradient = grad_var_pair[0]
+        # for grad_var_pair in adam_gradients:
+        #     current_variable = grad_var_pair[1]
+        #     current_gradient = grad_var_pair[0]
 
-            gradient_name_to_save = current_variable.name.replace(":", "_")
-            tf.summary.histogram(gradient_name_to_save, current_gradient)
+            # gradient_name_to_save = current_variable.name.replace(":", "_")
+            # tf.summary.histogram(gradient_name_to_save, current_gradient)
         adam_train_step = adam_optimizer.apply_gradients(grads_and_vars=adam_gradients, global_step=global_step)
         # train_op = slim.learning.create_train_op(loss, adam_optimizer, summarize_gradients=True)
-
-    tf.summary.scalar('learning_rate', learning_rate)
+    lr_op = tf.summary.scalar('learning_rate', learning_rate)
+    # tf.summary.scalar('learning_rate', learning_rate)
 
     # RMSprop优化器 lr=1e-5
     # with tf.variable_scope("rmsprop_vars"):
