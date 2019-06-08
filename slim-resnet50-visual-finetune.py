@@ -61,13 +61,13 @@ def main(_):
     # visual_layer = 172
     num_classes = 10
     # batch_size = FLAGS.batch_size
-    # batch_size = 128
-    batch_size = 64
+    batch_size = 128
+    # batch_size = 64
     # batch_size = 32
     train_examples_num = 20787
     # train_examples_num = 64
     # train_examples_num = 32
-    epochs_num_per_optimizer = 12
+    epochs_num_per_optimizer = 20
     # epochs_num_per_optimizer = 1
     num_steps = int(train_examples_num * epochs_num_per_optimizer / batch_size)
 
@@ -96,8 +96,8 @@ def main(_):
 
     # tfrecord数据已经预处理了，此处省略
     # resnet50 ImageNet的ckpt，
-    checkpoint_path = os.path.join(base_dir, 'resnet_v1_50.ckpt')
-    # checkpoint_path = os.path.join(base_dir, 'ckpt\\')
+    # checkpoint_path = os.path.join(base_dir, 'resnet_v1_50.ckpt')
+    checkpoint_path = os.path.join(base_dir, 'ckpt\\')
 
     resnet_model = model.Model(num_classes=num_classes, is_training=True, fixed_resize_side=model_image_size[0],
                                default_image_size=model_image_size[0])
@@ -118,7 +118,8 @@ def main(_):
         print('global_step:', global_step)
     init_fn = utils.get_init_fn(checkpoint_path=checkpoint_path)
 
-    learning_rate = 1e-4
+    # learning_rate = 1e-4
+    learning_rate = tf.placeholder(dtype=tf.float32, name='learning_rate')
     # adam优化器
     with tf.variable_scope("adam_vars"):
         adam_optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
@@ -133,7 +134,7 @@ def main(_):
         adam_train_step = adam_optimizer.apply_gradients(grads_and_vars=adam_gradients, global_step=global_step)
         # train_op = slim.learning.create_train_op(loss, adam_optimizer, summarize_gradients=True)
 
-    # tf.summary.scalar('learning_rate', learning_rate)
+    tf.summary.scalar('learning_rate', learning_rate)
 
     # RMSprop优化器 lr=1e-5
     # with tf.variable_scope("rmsprop_vars"):
@@ -216,10 +217,10 @@ def main(_):
         start = time.time()
         print('adam go-----------------')
         for i in range(num_steps):
-            gs, _ = sess.run([global_step, adam_train_step])
+            gs, _ = sess.run([global_step, adam_train_step], feed_dict={learning_rate: 1e-5})
             logging.debug("Current adam step: {0} _:{1} index:{2} ".format(gs, _, i))
-            adam_loss, summary_string, acc_score = sess.run([loss, merged_summary_op, accuracy])
-            logging.debug("adam step {0} Current Loss: {1} acc_score:{2} index:{3}".format(gs, adam_loss, acc_score, i))
+            lr, adam_loss, summary_string, acc_score = sess.run([learning_rate, loss, merged_summary_op, accuracy])
+            logging.debug("adam step {0} Current Loss: {1} acc_score:{2} index:{3}, learning_rate:{4}".format(gs, adam_loss, acc_score, i, lr))
             end = time.time()
             logging.debug("adam [{0:.2f}] imgs/s".format(batch_size / (end - start)))
             start = end
