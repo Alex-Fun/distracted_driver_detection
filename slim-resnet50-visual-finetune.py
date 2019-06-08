@@ -62,7 +62,7 @@ def main(_):
     num_classes = 10
     # batch_size = FLAGS.batch_size
     batch_size = 128
-    # batch_size = 64
+    batch_size = 64
     # batch_size = 32
     train_examples_num = 20787
     # train_examples_num = 64
