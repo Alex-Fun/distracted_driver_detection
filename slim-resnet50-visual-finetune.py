@@ -51,7 +51,7 @@ def main(_):
     logging.debug("begin begin_time:{}".format(begin_time))
 
     base_dir = "/data/oHongMenYan/distracted-driver-detection-dataset"
-    out_dir = '/output'
+    out_dir = "/output"
     # base_dir = r"D:\tmp\data\state-farm-distracted-driver-detection"
     # out_dir = r"D:\tmp\data\state-farm-distracted-driver-detection\output"
 
@@ -77,7 +77,7 @@ def main(_):
 
     logs_dir = os.path.join(out_dir, "logs")
     if not os.path.exists(logs_dir):
-        os.makedirs(imgs_dir, exist_ok=True)
+        os.makedirs(logs_dir, exist_ok=True)
 
     # 加载数据集
     # 读取tfrecord文件
