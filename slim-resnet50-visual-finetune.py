@@ -67,7 +67,7 @@ def main(_):
     train_examples_num = 20787
     # train_examples_num = 64
     # train_examples_num = 32
-    epochs_num_per_optimizer = 20
+    epochs_num_per_optimizer = 60
     # epochs_num_per_optimizer = 1
     num_steps = int(train_examples_num * epochs_num_per_optimizer / batch_size)
 
@@ -97,7 +97,7 @@ def main(_):
     # tfrecord数据已经预处理了，此处省略
     # resnet50 ImageNet的ckpt，
     # checkpoint_path = os.path.join(base_dir, 'resnet_v1_50.ckpt')
-    checkpoint_path = os.path.join(base_dir, 'model.ckpt-3896')
+    checkpoint_path = os.path.join(base_dir, 'model.ckpt-10391')
     # checkpoint_path = os.path.join(base_dir, 'ckpt')
 
     resnet_model = model.Model(num_classes=num_classes, is_training=True, fixed_resize_side=model_image_size[0],
