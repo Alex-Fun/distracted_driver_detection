@@ -23,7 +23,7 @@ def read_and_decode(filename_queue):
 def read_TFRecord(filename, image_shape, num_epochs=1, batch_size = 32):
     # filename是TFRecord文件路径，如果TFRecord和py文件在同一目录下可以只写文件名
     with tf.name_scope('input') as scope:
-        filename_queue = tf.train.string_input_producer([filename], num_epochs=num_epochs)
+        filename_queue = tf.train.string_input_producer([filename], num_epochs=num_epochs, name=scope)
     image, label = read_and_decode(filename_queue)
     image = tf.image.resize_images(image, image_shape)
     image_float = tf.to_float(image, name='ToFloat')
