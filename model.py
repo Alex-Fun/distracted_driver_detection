@@ -1,29 +1,33 @@
 import  tensorflow as tf
 from tensorflow.contrib.slim import nets
 import tensorflow.contrib.slim as slim
+import preprocessing
 # slim = tf.contrib.slim
 
 # class Model(object):
 class Model():
-    def __init__(self, num_classes, is_training, fixed_resize_side=224, default_image_size=240):
+    def __init__(self, num_classes, is_training, fixed_resize_side_min=224, fixed_resize_side_max=224, default_image_height=240, default_image_width=240):
         self._num_classes = num_classes
         self._is_training = is_training
-        self._fixed_resize_side = fixed_resize_side
-        self._default_image_size = default_image_size
+        self._fixed_resize_side_min = fixed_resize_side_min
+        self._fixed_resize_side_max = fixed_resize_side_max
+        self._default_image_height = default_image_height
+        self._default_image_width = default_image_width
 
     @property
     def num_class(self):
         return self._num_classes
 
-    # def preprocess(self, inputs):
-    #     preprocessed_inputs = preprocessing.preprocess_images(
-    #         inputs, self._default_image_size, self._default_image_size,
-    #         resize_side_min=self._fixed_resize_side,
-    #         is_training=self._is_training,
-    #         border_expand=True, normalize=False,
-    #         preserving_aspect_ratio_resize=False)
-    #     preprocessed_inputs = tf.cast(preprocessed_inputs, tf.float32)
-    #     return preprocessed_inputs
+    def preprocess(self, inputs):
+        preprocessed_inputs = preprocessing.preprocess_images(
+            inputs, self._default_image_height, self._default_image_width,
+            resize_side_min=self._fixed_resize_side_min,
+            resize_side_max=self._fixed_resize_side_max,
+            is_training=self._is_training,
+            border_expand=False, normalize=False,
+            preserving_aspect_ratio_resize=True)
+        preprocessed_inputs = tf.cast(preprocessed_inputs, tf.float32)
+        return preprocessed_inputs
 
     def predict(self, preprocessed_inputs):
         with slim.arg_scope(nets.resnet_v1.resnet_arg_scope()):
@@ -33,14 +37,14 @@ class Model():
             net = tf.squeeze(net, axis=[1, 2])
             net = slim.dropout(net, keep_prob=0.5, scope='scope')
             logits = slim.fully_connected(net, num_outputs=self.num_class, activation_fn=None, scope='Predict')
-        prediction_dict = {'logits': logits}
+        prediction_dict = {'logits': logits, 'end_points': end_points}
         return prediction_dict
 
     def postprocess(self, prediction_dict):
         logits = prediction_dict['logits']
         logits = tf.nn.softmax(logits)
         classes = tf.argmax(logits, axis=1)
-        postprocess_dict = {'logits': logits, 'classes': classes}
+        postprocess_dict = {'classes': classes}
         return postprocess_dict
 
     def loss(self, prediction_dict, ground_truth_lists):

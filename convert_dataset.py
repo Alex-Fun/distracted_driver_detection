@@ -111,7 +111,6 @@ def read_images_names(root, c_num=10, train=True):
             img_path = os.path.join(c_dir, img_name)
             data.append(img_path)
             label.append(c_index)
-            # print('---', img_path, c_index)
     print('===', len(list), len(label))
     return zip(data, label)
 

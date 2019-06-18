@@ -14,7 +14,7 @@ def read_and_decode(filename_queue):
     # 解码
     image = tf.image.decode_jpeg(contents=features['image/encoded'], channels=3)
 
-    # model_image_size = (240, 360)
+    # model_image_size = (240, 320)
     # label = tf.decode_raw(bytes=features['image/label'], out_type=tf.int64)
     label = features['image/label']
     label = tf.reshape(label, [1])

@@ -43,7 +43,7 @@ img_valid_zip_dir = os.path.join(base_dir, "valid.zip")
 unzip_imgs(img_valid_zip_dir, imgs_dir)
 
 
-model_image_size = (240, 360)
+model_image_size = (240, 320)
 fine_tune_layer = 152
 final_layer = 176
 visual_layer = 172
@@ -154,6 +154,7 @@ def show_heatmap_image(model_show, weights_show, img_dir):
         img = cv2.resize(img, (model_image_size[1], model_image_size[0]))
         x = img.copy()
         x.astype(np.float32)
+        # out种类，predictions概率
         out, predictions = model_show.predict(np.expand_dims(x, axis=0))
         predictions = predictions[0]
         out = out[0]

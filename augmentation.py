@@ -13,7 +13,7 @@ base_dir = r"D:\tmp\data\state-farm-distracted-driver-detection"
 out_dir = r'D:\tmp\data\test'
 batch_size = 128
 c_num = 10
-model_image_size = (240, 360)
+model_image_size = (240, 320)
 save_to_dir = os.path.join(base_dir, 'a')
 print("save_to_dir",save_to_dir)
 # 加载数据集
@@ -41,7 +41,6 @@ save_path = os.path.join(save_to_dir, 'train')
 for i in range(c_num):
     train_i_path = os.path.join(train_path, "ac%d"%i)
     save_i_path = os.path.join(save_path, "c%d"%i)
-    print(train_i_path, '---', save_i_path)
     if not os.path.exists(save_i_path):
         os.makedirs(save_i_path, True)
     train_generator = train_gen.flow_from_directory(train_i_path, model_image_size, shuffle=True,
