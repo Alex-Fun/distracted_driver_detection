@@ -13,7 +13,7 @@ def main(a):
     #config param
     base_dir = r'D:\tmp\data\state-farm-distracted-driver-detection'
     out_put_dir = r'D:\tmp\data\state-farm-distracted-driver-detection'
-    data_file_path = os.path.join(base_dir, 'train.record')
+    data_file_path = os.path.join(base_dir, 'new_train.record')
     ckpt_path = os.path.join(base_dir, 'inception_v3.ckpt')
 
     model_image_size = (360, 480)
