@@ -21,12 +21,13 @@ def main(a):
     ckpt_path = os.path.join(base_dir, 'inception_v3.ckpt')
 
     model_image_size = (360, 480)
+    model_image_size = (300, 400)
     # model_image_size = (299, 299)
     batch_size = 64
     num_classes = 10
-    epochs_num = 20
+    epochs_num = 30
     train_examples_num = 20787
-    train_examples_num = batch_size
+    # train_examples_num = batch_size
     num_steps = int(epochs_num * train_examples_num / batch_size)
 
     img_dir = os.path.join(out_put_dir, 'img')
@@ -37,8 +38,7 @@ def main(a):
         os.makedirs(logs_dir)
 
     # 读取数据
-    # images, labels = utils.read_TFRecord(data_file_path, model_image_size, num_epochs=10*epochs_num, batch_size=batch_size)
-    images, labels = utils.read_TFRecord(data_file_path, model_image_size, num_epochs=1, batch_size=batch_size)
+    images, labels = utils.read_TFRecord(data_file_path, model_image_size, num_epochs=10*epochs_num, batch_size=batch_size)
     # 配置模型
     # inception_model = model.Model(num_classes=num_classes, is_training=True, fixed_resize_side_min=model_image_size[0],
     inception_model = model.Model(num_classes=num_classes, is_training=True, fixed_resize_side_min=299,
