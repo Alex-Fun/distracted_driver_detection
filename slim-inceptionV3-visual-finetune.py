@@ -21,9 +21,9 @@ def main(a):
     ckpt_path = os.path.join(base_dir, 'inception_v3.ckpt')
 
     model_image_size = (360, 480)
-    model_image_size = (300, 400)
     # model_image_size = (299, 299)
     batch_size = 64
+    batch_size = 32
     num_classes = 10
     epochs_num = 30
     train_examples_num = 20787
