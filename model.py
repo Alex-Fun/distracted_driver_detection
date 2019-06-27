@@ -1,7 +1,9 @@
 import  tensorflow as tf
 from tensorflow.contrib.slim import nets
 import tensorflow.contrib.slim as slim
-import preprocessing
+import vgg_preprocessing
+import inception_preprocessing
+import inception_v3
 # slim = tf.contrib.slim
 
 # class Model(object):
@@ -19,20 +21,32 @@ class Model():
         return self._num_classes
 
     def preprocess(self, inputs):
-        preprocessed_inputs = preprocessing.preprocess_images(
+        # preprocessed_inputs = vgg_preprocessing.preprocess_images(
+        #     inputs, self._default_image_height, self._default_image_width,
+        #     resize_side_min=self._fixed_resize_side_min,
+        #     resize_side_max=self._fixed_resize_side_max,
+        #     is_training=self._is_training,
+        #     border_expand=False, normalize=False,
+        #     preserving_aspect_ratio_resize=True)
+
+        preprocessed_inputs = inception_preprocessing.preprocess_images(
             inputs, self._default_image_height, self._default_image_width,
-            resize_side_min=self._fixed_resize_side_min,
-            resize_side_max=self._fixed_resize_side_max,
-            is_training=self._is_training,
-            border_expand=False, normalize=False,
-            preserving_aspect_ratio_resize=True)
+            is_training=self._is_training, add_image_summaries=False)
         preprocessed_inputs = tf.cast(preprocessed_inputs, tf.float32)
         return preprocessed_inputs
 
     def predict(self, preprocessed_inputs):
-        with slim.arg_scope(nets.resnet_v1.resnet_arg_scope()):
-            net, end_points = nets.resnet_v1.resnet_v1_50(
-                preprocessed_inputs, num_classes=None, is_training=self._is_training)
+        # with slim.arg_scope(nets.resnet_v1.resnet_arg_scope()):
+        #     net, end_points = nets.resnet_v1.resnet_v1_50(
+        #         preprocessed_inputs, num_classes=self.num_class, is_training=self._is_training)
+
+        # with slim.arg_scope(nets.inception.inception_v3_arg_scope()):
+        #     net, end_points = nets.inception.inception_v3(
+        #         preprocessed_inputs, num_classes=self.num_class, is_training=self._is_training)
+        with slim.arg_scope(inception_v3.inception_v3_arg_scope):
+            net, end_points = inception_v3.inception_v3(preprocessed_inputs,
+                 num_classes=self.num_class, is_training=self._is_training, spatial_squeeze=False, global_pool=True)
+                 # num_classes=self.num_class, is_training=self._is_training)
         with tf.variable_scope('Logits'):
             net = tf.squeeze(net, axis=[1, 2])
             net = slim.dropout(net, keep_prob=0.5, scope='scope')
