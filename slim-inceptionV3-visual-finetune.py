@@ -19,6 +19,7 @@ def main(a):
 
     data_file_path = os.path.join(base_dir, 'new_train.record')
     ckpt_path = os.path.join(base_dir, 'inception_v3.ckpt')
+    ckpt_path = os.path.join(base_dir, 'model_inceptionv3_adam.ckpt-19487')
 
     model_image_size = (360, 480)
     # model_image_size = (299, 299)
