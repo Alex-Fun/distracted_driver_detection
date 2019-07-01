@@ -22,6 +22,8 @@ def main(a):
     ckpt_path = os.path.join(base_dir, 'model_inceptionv3_adam.ckpt-19487')
     ckpt_path = os.path.join(base_dir, 'ckpt', 'checkpoint')
     ckpt_path = os.path.join(base_dir, 'ckpt')
+    ckpt_path = os.path.join(base_dir, 'checkpoint')
+    print('ckpt_path--------------',ckpt_path)
 
     model_image_size = (360, 480)
     # model_image_size = (299, 299)
