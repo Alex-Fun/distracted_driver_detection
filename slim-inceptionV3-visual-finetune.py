@@ -18,18 +18,18 @@ def main(a):
     out_put_dir = "/output"
 
     data_file_path = os.path.join(base_dir, 'new_train.record')
+    ckpt_path = os.path.join(base_dir, 'inception_v3.ckpt')
     ckpt_path = os.path.join(base_dir, 'model_inceptionv3_adam.ckpt-19487')
     ckpt_path = os.path.join(base_dir, 'ckpt', 'checkpoint')
     ckpt_path = os.path.join(base_dir, 'ckpt')
-    ckpt_path = os.path.join(base_dir, 'inception_v3.ckpt')
 
     model_image_size = (360, 480)
     # model_image_size = (299, 299)
     batch_size = 64
     batch_size = 32
     num_classes = 10
-    # epochs_num = 30
-    epochs_num = 1
+    epochs_num = 30
+    # epochs_num = 1
     train_examples_num = 20787
     # train_examples_num = batch_size
     num_steps = int(epochs_num * train_examples_num / batch_size)
@@ -78,7 +78,9 @@ def main(a):
         # 不需要从谷歌模型中加载的参数,这里就是最后的全连接层。因为输出类别不一样，所以最后全连接层的参数也不一样
     CHECKPOINT_EXCLUDE_SCOPES = None
     CHECKPOINT_EXCLUDE_SCOPES = ['InceptionV3/Logits', 'InceptionV3/AuxLogits']
+    print('before get_init_fn')
     init_fn = utils.get_init_fn(checkpoint_path=ckpt_path, checkpoint_exclude_scopes=CHECKPOINT_EXCLUDE_SCOPES)
+    print('after get_init_fn')
 
     # 配置优化器
     with tf.variable_scope('adam_vars'):
