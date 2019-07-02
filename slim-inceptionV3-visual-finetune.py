@@ -18,7 +18,7 @@ def main(a):
     out_put_dir = "/output"
 
     init_global_step= 0
-    init_global_step= 19487
+    # init_global_step= 19487
 
     data_file_path = os.path.join(base_dir, 'new_train.record')
     ckpt_path = os.path.join(base_dir, 'model_inceptionv3_adam.ckpt-19487')
