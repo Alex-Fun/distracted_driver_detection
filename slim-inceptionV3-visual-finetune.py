@@ -29,7 +29,7 @@ def main(a):
     model_image_size = (360, 480)
     # model_image_size = (299, 299)
     batch_size = 64
-    # batch_size = 32
+    batch_size = 32
     num_classes = 10
     epochs_num = 30
     # epochs_num = 1
