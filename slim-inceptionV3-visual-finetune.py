@@ -32,7 +32,7 @@ def main(a):
     # batch_size = 32
     num_classes = 10
     epochs_num = 30
-    epochs_num = 1
+    # epochs_num = 1
     train_examples_num = 20787
     # train_examples_num = batch_size
     num_steps = int(epochs_num * train_examples_num / batch_size)
