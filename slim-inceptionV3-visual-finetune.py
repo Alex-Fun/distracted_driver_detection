@@ -17,19 +17,22 @@ def main(a):
     base_dir = "/data/oHongMenYan/distracted-driver-detection-dataset"
     out_put_dir = "/output"
 
+    init_global_step= 0
+    init_global_step= 19487
+
     data_file_path = os.path.join(base_dir, 'new_train.record')
-    ckpt_path = os.path.join(base_dir, 'inception_v3.ckpt')
-    ckpt_path = os.path.join(base_dir, 'ckpt', 'checkpoint')
     ckpt_path = os.path.join(base_dir, 'model_inceptionv3_adam.ckpt-19487')
-    print('ckpt_path--------------',ckpt_path)
+    ckpt_path = os.path.join(base_dir, 'ckpt')
+    ckpt_path = os.path.join(base_dir, 'inception_v3.ckpt')
+    print('ckpt_path--------------', ckpt_path)
 
     model_image_size = (360, 480)
     # model_image_size = (299, 299)
     batch_size = 64
-    batch_size = 32
+    # batch_size = 32
     num_classes = 10
     epochs_num = 30
-    # epochs_num = 1
+    epochs_num = 1
     train_examples_num = 20787
     # train_examples_num = batch_size
     num_steps = int(epochs_num * train_examples_num / batch_size)
@@ -68,11 +71,11 @@ def main(a):
     tf.summary.scalar('loss', loss)
     tf.summary.scalar('accuracy', accuracy)
 
-    # get global_step
-    global_step = slim.get_global_step()
+    # global_step
+    global_step = tf.train.create_global_step()
     if global_step is None:
         print('global_step is none')
-        global_step = tf.Variable(initial_value=0, dtype=tf.int64, trainable=False, name='global_step')
+        global_step = tf.Variable(initial_value=init_global_step, dtype=tf.int64, trainable=False, name='global_step')
 
     # 读取ckpt
         # 不需要从谷歌模型中加载的参数,这里就是最后的全连接层。因为输出类别不一样，所以最后全连接层的参数也不一样
@@ -84,10 +87,10 @@ def main(a):
 
     # 配置优化器
     with tf.variable_scope('adam_vars'):
-        learning_rate = tf.Variable(initial_value=1e-6, dtype=tf.float32, trainable=False, name='learning_rate')
+        learning_rate = tf.Variable(initial_value=1e-3, dtype=tf.float32, trainable=False, name='learning_rate')
         adam_opt = tf.train.AdamOptimizer(learning_rate=learning_rate)
         adam_train_step = adam_opt.minimize(loss, global_step=global_step)
-        tf.summary.scalar('learning_rate', learning_rate)
+        tf.summary.scalar('the_learning_rate', learning_rate)
 
     # merge all summary
     merged_summary_op = tf.summary.merge_all()
@@ -117,18 +120,26 @@ def main(a):
         logging.debug("train begin, time:%d", begin_time)
         for i in range(num_steps):
             gs, _ = sess.run([global_step, adam_train_step])
-            logging.debug("step_num i:%d, global_step: %d", i, global_step)
+            logging.debug("step_num i:%d, global_step: %d", i, gs)
+            print("step_num i:%d, global_step: %d"%( i, gs))
 
             loss_result, accuracy_result, lr, summary_string = sess.run([loss, accuracy, learning_rate, merged_summary_op])
             step_time = time.time() - step_time
-            logging.debug("step_num i:%d, global_step: %d, loss:%f, acc:%f, learning_rate:%f, step_time:%d, imgs_per_time",
-                          i, global_step, loss_result, accuracy_result, lr, step_time, batch_size/step_time)
+            logging.debug("step_num i:%d, global_step: %d, loss:%f, acc:%f, learning_rate:%f, step_time:%d, imgs_per_time:%d",
+                          i, gs, loss_result, accuracy_result, lr, step_time, batch_size/step_time)
+            print("step_num i:%d, global_step: %d, loss:%f, acc:%f, learning_rate:%f, step_time:%d, imgs_per_time:%d" %
+                   (i, gs, loss_result, accuracy_result, lr, step_time, batch_size/step_time))
 
             summary_writer.add_summary(summary_string, global_step=gs)
+            if (i+1) % 1000 == 0:
+                save_path_name = 'model_inceptionv3_adam_%.ckpt' % gs
+                save_path = saver.save(sess, os.path.join(logs_dir, save_path_name), global_step=gs)
+                logging.debug("model---saved, save_path:%s, cost_time:%d", save_path, time.time() - begin_time)
+                print("model---saved, save_path:%s, cost_time:%d" % (save_path, time.time() - begin_time))
 
-
-        save_path = saver.save(sess, os.path.join(logs_dir, 'model_inceptionv3_adam.ckpt'), global_step= num_steps)
+        save_path = saver.save(sess, os.path.join(logs_dir, 'model_inceptionv3_adam.ckpt'), global_step= gs)
         logging.debug("model saved, save_path:%s, cost_time:%d",save_path, time.time()-begin_time)
+        print("model saved, save_path:%s, cost_time:%d"%(save_path, time.time()-begin_time))
 
     summary_writer.close()
 

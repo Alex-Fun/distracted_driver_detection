@@ -112,7 +112,7 @@ def main(_):
     tf.summary.scalar('loss', loss)
     tf.summary.scalar('accuracy', accuracy)
 
-    global_step = slim.get_global_step()
+    global_step = slim.create_global_step()
     if not global_step:
         print("global_step is none")
         # Creates a variable to hold the global_step.
