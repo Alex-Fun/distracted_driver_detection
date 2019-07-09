@@ -11,11 +11,11 @@ import model
 
 def main(a):
     # config param
-    base_dir = r'E:\tmp\data\state-farm-distracted-driver-detection'
-    out_put_dir = r'E:\tmp\data\state-farm-distracted-driver-detection'
+    # base_dir = r'E:\tmp\data\state-farm-distracted-driver-detection'
+    # out_put_dir = r'E:\tmp\data\state-farm-distracted-driver-detection'
 
-    # base_dir = "/data/oHongMenYan/distracted-driver-detection-dataset"
-    # out_put_dir = "/output"
+    base_dir = "/data/oHongMenYan/distracted-driver-detection-dataset"
+    out_put_dir = "/output"
 
     init_global_step = 0
     # init_global_step= 19487
@@ -25,7 +25,6 @@ def main(a):
     ckpt_path = os.path.join(base_dir, 'model_inceptionv3_adam.ckpt-19487')
     ckpt_path = os.path.join(base_dir, 'ckpt')
     ckpt_path = os.path.join(base_dir, 'inception_v3.ckpt')
-    print('ckpt_path--------------', ckpt_path)
 
     input_image_size = (480, 640)
     model_image_size = (360, 480)
@@ -59,10 +58,8 @@ def main(a):
     # 配置模型
     # inception_model = model.Model(num_classes=num_classes, is_training=True,
     # fixed_resize_side_min=model_image_size[0],
-    is_training = tf.placeholder(dtype=tf.bool, name='is_training')
     inception_model = model.Model(
         num_classes=num_classes,
-        is_training=is_training,
         fixed_resize_side_min=299,
         default_image_height=model_image_size[0],
         default_image_width=model_image_size[1])
@@ -181,7 +178,6 @@ def main(a):
             train_img_batch, train_label_batch = sess.run([train_images, train_labels])
             gs, _ = sess.run([global_step, adam_train_step]
                              , feed_dict={
-                    is_training: True,
                     images: train_img_batch,
                     labels: train_label_batch
                 }
@@ -193,7 +189,6 @@ def main(a):
             loss_result, accuracy_result, lr_o_t, lr_ct, summary_string = sess.run(
                 [loss, accuracy, opt_lr_t, current_lr, merged_summary_op]
                 , feed_dict={
-                    is_training: True,
                     images: train_img_batch,
                     labels: train_label_batch
                 }
@@ -213,7 +208,6 @@ def main(a):
                 val_loss_result, val_accuracy_result = sess.run(
                     [loss, accuracy]
                     , feed_dict={
-                        is_training: False,
                         images: val_img_batch,
                         labels: val_label_batch
                     }
