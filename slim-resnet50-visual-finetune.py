@@ -52,8 +52,8 @@ def main(_):
 
     base_dir = "/data/oHongMenYan/distracted-driver-detection-dataset"
     out_dir = "/output"
-    # base_dir = r"D:\tmp\data\state-farm-distracted-driver-detection"
-    # out_dir = r"D:\tmp\data\state-farm-distracted-driver-detection\output"
+    # base_dir = r"E:\tmp\data\state-farm-distracted-driver-detection"
+    # out_dir = r"E:\tmp\data\state-farm-distracted-driver-detection\output"
 
     model_image_size = (240, 320)
     # fine_tune_layer = 152

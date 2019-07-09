@@ -8,9 +8,9 @@ from tensorflow.keras.applications import *
 from tensorflow.keras.preprocessing.image import *
 
 # base_dir = "/data/oHongMenYan/distracted-driver-detection-dataset"
-base_dir = r"D:\tmp\data\state-farm-distracted-driver-detection"
+base_dir = r"E:\tmp\data\state-farm-distracted-driver-detection"
 # out_dir = '/output'
-out_dir = r'D:\tmp\data\test'
+out_dir = r'E:\tmp\data\test'
 batch_size = 128
 c_num = 10
 model_image_size = (240, 320)

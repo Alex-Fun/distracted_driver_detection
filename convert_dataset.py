@@ -127,12 +127,12 @@ def main(_):
     logging.info('Prepare dataset file names')
 
     output_dir = FLAGS.output_dir
-    output_dir = r'D:\tmp\data\state-farm-distracted-driver-detection'
+    output_dir = r'E:\tmp\data\state-farm-distracted-driver-detection'
     train_output_path = os.path.join(output_dir, 'train.record')
     val_output_path = os.path.join(output_dir, 'val.record')
     data_dir = FLAGS.data_dir
-    data_dir = r'D:\tmp\data\state-farm-distracted-driver-detection\a'
-    data_dir = r'D:\tmp\data\state-farm-distracted-driver-detection'
+    data_dir = r'E:\tmp\data\state-farm-distracted-driver-detection\a'
+    data_dir = r'E:\tmp\data\state-farm-distracted-driver-detection'
     # csv_label_dict = read_label_dict(os.path.join(data_dir, 'driver_imgs_list.csv'))
     train_files = read_images_names(data_dir, 10, True)
     val_files = read_images_names(data_dir, 10, False)

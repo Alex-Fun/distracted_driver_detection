@@ -19,7 +19,7 @@ def main(_):
     input_type = 'image_tensor'
     ckpt_name = 'model.ckpt-3901'
     ckpt_name = 'model.ckpt-29878'
-    out_dir = r"D:\tmp\data\state-farm-distracted-driver-detection\output"
+    out_dir = r"E:\tmp\data\state-farm-distracted-driver-detection\output"
     logs_dir = os.path.join(out_dir, "logs")
     trained_checkpoint_prefix = os.path.join(logs_dir, ckpt_name)
     exporter.export_inference_graph(input_type,

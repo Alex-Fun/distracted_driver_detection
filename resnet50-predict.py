@@ -12,10 +12,10 @@ import numpy as np
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s', level=logging.DEBUG)
 
 def main(_):
-    ckpt_path = r"D:\tmp\data\state-farm-distracted-driver-detection\output\logs\model.ckpt-29878"
-    ckpt_path = r"D:\tmp\data\state-farm-distracted-driver-detection\output\logs\model.ckpt-3901"
-    # ckpt_path = r"D:\tmp\data\state-farm-distracted-driver-detection\ckpt\model.ckpt-3728"
-    img_dir_format = r'D:\tmp\data\state-farm-distracted-driver-detection\valid1\c%'
+    ckpt_path = r"E:\tmp\data\state-farm-distracted-driver-detection\output\logs\model.ckpt-29878"
+    ckpt_path = r"E:\tmp\data\state-farm-distracted-driver-detection\output\logs\model.ckpt-3901"
+    # ckpt_path = r"E:\tmp\data\state-farm-distracted-driver-detection\ckpt\model.ckpt-3728"
+    img_dir_format = r'E:\tmp\data\state-farm-distracted-driver-detection\valid1\c%'
     class_num = 10
     tf.nn.conv2d
     with tf.Session() as sess:

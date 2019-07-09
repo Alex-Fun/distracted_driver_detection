@@ -27,18 +27,18 @@ def main(_):
     # os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 
     frozen_inference_graph_path = FLAGS.frozen_inference_graph_path
-    frozen_inference_graph_path = r'D:\tmp\data\state-farm-distracted-driver-detection\output\logs\frozen_inference_graph.pb'
-    frozen_inference_graph_path = r'D:\tmp\data\state-farm-distracted-driver-detection\output\frozen_inference_graph.pb'
+    frozen_inference_graph_path = r'E:\tmp\data\state-farm-distracted-driver-detection\output\logs\frozen_inference_graph.pb'
+    frozen_inference_graph_path = r'E:\tmp\data\state-farm-distracted-driver-detection\output\frozen_inference_graph.pb'
     model = predictor.Predictor(frozen_inference_graph_path)
 
     # images_dir = FLAGS.images_dir
     # annotation_path = FLAGS.annotation_path
     # _, annotation_dict = data_provider.provide(annotation_path, images_dir)
-    val_data_dir = r'D:\tmp\data\state-farm-distracted-driver-detection\valid'
+    val_data_dir = r'E:\tmp\data\state-farm-distracted-driver-detection\valid'
     class_num = 10
 
     output_path = FLAGS.output_path
-    output_path = r'D:\tmp\data\state-farm-distracted-driver-detection\output\logs\val_results.json'
+    output_path = r'E:\tmp\data\state-farm-distracted-driver-detection\output\logs\val_results.json'
 
 
 

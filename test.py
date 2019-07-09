@@ -2,6 +2,7 @@ import os
 import cv2 as cv
 import zipfile
 import matplotlib.pyplot as plt
+import tensorflow as tf
 
 # base_dir = "/data/oHongMenYan/distracted-driver-detection-dataset"
 # img_zip_dir = os.path.join(base_dir, 'imgs.zip')

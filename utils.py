@@ -20,6 +20,70 @@ def read_and_decode(filename_queue):
     label = tf.reshape(label, [1])
     return image, label
 
+def parse(record):
+    features = tf.parse_single_example(
+        record,
+        features={
+            'image/encoded': tf.FixedLenFeature([], tf.string),
+            'image/label': tf.FixedLenFeature([], tf.int64),
+            # 'pixels': tf.FixedLenFeature([], tf.int64)
+        }
+    )
+    # decode_raw用于解析TFRecord里面的字符串
+    # decoded_image = tf.decode_raw(features['image/encoded'], tf.uint8)
+    # label = features['image/label']
+
+    # 解码
+    decoded_image = tf.image.decode_jpeg(contents=features['image/encoded'], channels=3)
+    label = tf.reshape(features['image/label'], [1])
+    # 要注意这里的decoded_image并不能直接进行reshape操作
+    # 之前我们在存储的时候，把图片进行了tostring()操作
+    # 这会导致图片的长度在原来基础上*8
+    # 后面我们要用到numpy的fromstring来处理
+    return decoded_image, label
+
+def read_TFRecord2(filename, num_epochs=None, shuffle_buffer=10000, batch_size = 32):
+    # 为了配合输出次数，一般默认repeat()空
+    # shuffle_buffer打乱顺序，数值越大，混乱程度越大，并设置出队和入队中元素最少的个数，这里默认是10000个
+    # num_epochs 定义数据重复的次数
+
+    #利用TFRecordDataset读取TFRecord文件
+    dataset = tf.data.TFRecordDataset([filename])
+    #解析TFRecord
+    dataset = dataset.map(parse)
+    #把数据打乱顺序并组装成batch
+    # dataset = dataset.shuffle(shuffle_buffer).batch(batch_size)
+    dataset = dataset.shuffle(shuffle_buffer).batch(batch_size)
+    # dataset = dataset.repeat(num_epochs)
+    dataset = dataset.repeat(10)
+    #定义迭代器来获取处理后的数据
+    iterator = dataset.make_one_shot_iterator()
+    #迭代器开始迭代
+    images, labels = iterator.get_next()
+
+
+    # #读取验证数据（同上）
+    # valida_dataset = tf.data.TFRecordDataset([VALIDATION_DATA])
+    # valida_dataset = valida_dataset.map(parse)
+    # valida_dataset = valida_dataset.batch(BATCH)
+    # valida_iterator = valida_dataset.make_one_shot_iterator()
+    # valida_img,valida_label = valida_iterator.get_next()
+
+    # # filename是TFRecord文件路径，如果TFRecord和py文件在同一目录下可以只写文件名
+    # with tf.name_scope('input') as scope:
+    #     filename_queue = tf.train.string_input_producer([filename], num_epochs=num_epochs, name=scope)
+    # image, label = read_and_decode(filename_queue)
+    # image = tf.image.resize_images(image, image_shape)
+    # image_float = tf.to_float(image, name='ToFloat')
+    # seed = time.time()
+    #
+    # images, labels = tf.train.shuffle_batch([image_float, label], seed= seed,
+    #                                                        batch_size=batch_size,
+    #                                                        num_threads=4,
+    #                                                        capacity=100 + 3 * batch_size,
+    #                                                        min_after_dequeue=100)
+    return images, labels
+
 def read_TFRecord(filename, image_shape, num_epochs=1, batch_size = 32):
     # filename是TFRecord文件路径，如果TFRecord和py文件在同一目录下可以只写文件名
     with tf.name_scope('input') as scope:
