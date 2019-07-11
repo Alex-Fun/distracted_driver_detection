@@ -60,6 +60,7 @@ def main(a):
     # fixed_resize_side_min=model_image_size[0],
     inception_model = model.Model(
         num_classes=num_classes,
+        is_training=True,
         fixed_resize_side_min=299,
         default_image_height=model_image_size[0],
         default_image_width=model_image_size[1])
@@ -203,7 +204,7 @@ def main(a):
             #        (i, gs, loss_result, accuracy_result, lr, step_time, batch_size/step_time))
 
             # 查看验证集指标
-            if (i + 1) % 2 == 0:
+            if (i + 1) % 1000 == 0:
                 val_img_batch, val_label_batch = sess.run([val_images, val_labels])
                 val_loss_result, val_accuracy_result = sess.run(
                     [loss, accuracy]
