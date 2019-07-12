@@ -136,7 +136,7 @@ def main(a):
             batch_size *
             num_epochs_per_decay)
         decay_steps = 100
-        # learning_rate = tf.train.exponential_decay(learning_rate, global_step, decay_steps, decay_rate, staircase=False)
+        learning_rate = tf.train.exponential_decay(learning_rate, global_step, decay_steps, decay_rate, staircase=False)
         # learning_rate = tf.Variable(initial_value=1e-3, dtype=tf.float32, trainable=False, name='learning_rate')
 
         # adam_opt = tf.train.AdamOptimizer(learning_rate=learning_rate)
